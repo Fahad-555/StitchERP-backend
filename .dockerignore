@@ -1,0 +1,12 @@
+**/.git
+**/.gitignore
+**/.vs
+**/bin
+**/obj
+**/.DS_Store
+**/.vscode
+.git
+.gitignore
+.dockerignore
+.env
+README.md
