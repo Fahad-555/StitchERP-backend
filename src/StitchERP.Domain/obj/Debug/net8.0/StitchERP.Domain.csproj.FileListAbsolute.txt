@@ -1,0 +1,11 @@
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Domain\bin\Debug\net8.0\StitchERP.Domain.deps.json
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Domain\bin\Debug\net8.0\StitchERP.Domain.dll
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Domain\bin\Debug\net8.0\StitchERP.Domain.pdb
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Domain\obj\Debug\net8.0\StitchERP.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Domain\obj\Debug\net8.0\StitchERP.Domain.AssemblyInfoInputs.cache
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Domain\obj\Debug\net8.0\StitchERP.Domain.AssemblyInfo.cs
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Domain\obj\Debug\net8.0\StitchERP.Domain.csproj.CoreCompileInputs.cache
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Domain\obj\Debug\net8.0\StitchERP.Domain.dll
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Domain\obj\Debug\net8.0\refint\StitchERP.Domain.dll
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Domain\obj\Debug\net8.0\StitchERP.Domain.pdb
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Domain\obj\Debug\net8.0\ref\StitchERP.Domain.dll

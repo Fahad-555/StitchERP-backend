@@ -1,0 +1,15 @@
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Application\bin\Debug\net8.0\StitchERP.Application.deps.json
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Application\bin\Debug\net8.0\StitchERP.Application.dll
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Application\bin\Debug\net8.0\StitchERP.Application.pdb
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Application\bin\Debug\net8.0\StitchERP.Domain.dll
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Application\bin\Debug\net8.0\StitchERP.Domain.pdb
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Application\obj\Debug\net8.0\StitchERP.Application.csproj.AssemblyReference.cache
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Application\obj\Debug\net8.0\StitchERP.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Application\obj\Debug\net8.0\StitchERP.Application.AssemblyInfoInputs.cache
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Application\obj\Debug\net8.0\StitchERP.Application.AssemblyInfo.cs
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Application\obj\Debug\net8.0\StitchERP.Application.csproj.CoreCompileInputs.cache
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Application\obj\Debug\net8.0\StitchER.43F9714C.Up2Date
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Application\obj\Debug\net8.0\StitchERP.Application.dll
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Application\obj\Debug\net8.0\refint\StitchERP.Application.dll
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Application\obj\Debug\net8.0\StitchERP.Application.pdb
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Application\obj\Debug\net8.0\ref\StitchERP.Application.dll

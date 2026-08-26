@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "1q9ozt6T75ytF6YIbfbUYKNxPXHcIa0R6oEjNtBRaDQ=",
+  "Source": "StitchERP.Api",
+  "BasePath": "_content/StitchERP.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

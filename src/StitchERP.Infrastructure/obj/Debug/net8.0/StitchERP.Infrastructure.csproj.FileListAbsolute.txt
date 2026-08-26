@@ -1,0 +1,17 @@
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Infrastructure\bin\Debug\net8.0\StitchERP.Infrastructure.deps.json
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Infrastructure\bin\Debug\net8.0\StitchERP.Infrastructure.dll
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Infrastructure\bin\Debug\net8.0\StitchERP.Infrastructure.pdb
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Infrastructure\bin\Debug\net8.0\StitchERP.Application.dll
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Infrastructure\bin\Debug\net8.0\StitchERP.Domain.dll
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Infrastructure\bin\Debug\net8.0\StitchERP.Domain.pdb
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Infrastructure\bin\Debug\net8.0\StitchERP.Application.pdb
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Infrastructure\obj\Debug\net8.0\StitchERP.Infrastructure.csproj.AssemblyReference.cache
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Infrastructure\obj\Debug\net8.0\StitchERP.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Infrastructure\obj\Debug\net8.0\StitchERP.Infrastructure.AssemblyInfoInputs.cache
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Infrastructure\obj\Debug\net8.0\StitchERP.Infrastructure.AssemblyInfo.cs
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Infrastructure\obj\Debug\net8.0\StitchERP.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Infrastructure\obj\Debug\net8.0\StitchER.AD4EEC90.Up2Date
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Infrastructure\obj\Debug\net8.0\StitchERP.Infrastructure.dll
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Infrastructure\obj\Debug\net8.0\refint\StitchERP.Infrastructure.dll
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Infrastructure\obj\Debug\net8.0\StitchERP.Infrastructure.pdb
+C:\Users\Fahad Bhutta\Desktop\ERP\StitchERP_Production\backend\src\StitchERP.Infrastructure\obj\Debug\net8.0\ref\StitchERP.Infrastructure.dll
