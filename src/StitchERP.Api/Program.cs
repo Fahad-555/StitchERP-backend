@@ -20,6 +20,9 @@ builder.Services.AddCors(options =>
             "http://127.0.0.1:4300",
             "http://localhost:4300",
             frontendOrigin)
+        .SetIsOriginAllowed(origin =>
+            Uri.TryCreate(origin, UriKind.Absolute, out var uri) &&
+            uri.Host.EndsWith(".vercel.app", StringComparison.OrdinalIgnoreCase))
         .AllowAnyHeader()
         .AllowAnyMethod());
 });
