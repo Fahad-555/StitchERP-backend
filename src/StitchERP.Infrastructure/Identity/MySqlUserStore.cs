@@ -6,8 +6,16 @@ using StitchERP.Infrastructure.Data;
 
 namespace StitchERP.Infrastructure.Identity;
 
-public sealed class MySqlUserStore(StitchErpDbContext db) : IUserStore
+public sealed class MySqlUserStore : IUserStore
 {
+    private readonly StitchErpDbContext db;
+
+    public MySqlUserStore(StitchErpDbContext db)
+    {
+        this.db = db;
+        EnsureBootstrapAdmin();
+    }
+
     public IReadOnlyCollection<ManagedUser> GetUsers()
     {
         using var command = Command("SELECT u.user_id, u.username, u.email, CONCAT(u.first_name, ' ', u.last_name), u.organization_id, u.is_active, u.password_hash, GROUP_CONCAT(r.role_code) FROM app_users u LEFT JOIN app_user_roles ur ON ur.user_id = u.user_id LEFT JOIN app_roles r ON r.role_id = ur.role_id GROUP BY u.user_id");
@@ -52,6 +60,17 @@ public sealed class MySqlUserStore(StitchErpDbContext db) : IUserStore
     }
     public ManagedUser SetPassword(long id, string password) { if (password.Length < 8) throw new ArgumentException("Password must be at least 8 characters."); Execute("UPDATE app_users SET password_hash = @hash, updated_at = CURRENT_TIMESTAMP WHERE user_id = @id", ("@hash", InMemoryUserStore.Hash(password)), ("@id", id)); return FindById(id); }
     public ManagedUser ChangePassword(ChangePasswordRequest request) { var user = FindById(request.UserId); if (!CryptographicOperations.FixedTimeEquals(Convert.FromBase64String(user.PasswordHash), Convert.FromBase64String(InMemoryUserStore.Hash(request.CurrentPassword)))) throw new UnauthorizedAccessException("Current password is incorrect."); return SetPassword(request.UserId, request.NewPassword); }
+
+    private void EnsureBootstrapAdmin()
+    {
+        var password = Environment.GetEnvironmentVariable("BOOTSTRAP_ADMIN_PASSWORD");
+        if (string.IsNullOrWhiteSpace(password)) return;
+        using var connection = db.Database.GetDbConnection(); connection.Open();
+        using var command = connection.CreateCommand();
+        command.CommandText = "INSERT INTO app_users (organization_id, username, email, first_name, last_name, is_active, password_hash) SELECT 1, 'admin', 'admin@stitcherp.local', 'System', 'Administrator', 1, @hash WHERE NOT EXISTS (SELECT 1 FROM app_users WHERE username = 'admin'); INSERT INTO app_user_roles (user_id, role_id) SELECT u.user_id, r.role_id FROM app_users u JOIN app_roles r ON r.organization_id = u.organization_id AND r.role_code = 'ADMIN' WHERE u.username = 'admin' AND NOT EXISTS (SELECT 1 FROM app_user_roles ur WHERE ur.user_id = u.user_id AND ur.role_id = r.role_id);";
+        Add(command, "@hash", InMemoryUserStore.Hash(password));
+        command.ExecuteNonQuery();
+    }
 
     private ManagedUser FindById(long id) => GetUsers().First(x => x.Id == id);
     private IDbCommand Command(string sql) { var command = db.Database.GetDbConnection().CreateCommand(); command.CommandText = sql; if (command.Connection!.State != ConnectionState.Open) command.Connection.Open(); return command; }
