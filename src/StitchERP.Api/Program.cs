@@ -11,10 +11,15 @@ builder.Services.AddAuthorization();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHealthChecks();
+var frontendOrigin = builder.Configuration["FRONTEND_ORIGIN"] ?? "https://stitcherp.vercel.app";
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policy => policy
-        .WithOrigins("http://localhost:4200", "http://127.0.0.1:4300", "http://localhost:4300")
+        .WithOrigins(
+            "http://localhost:4200",
+            "http://127.0.0.1:4300",
+            "http://localhost:4300",
+            frontendOrigin)
         .AllowAnyHeader()
         .AllowAnyMethod());
 });
