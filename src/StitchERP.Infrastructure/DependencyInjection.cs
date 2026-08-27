@@ -5,6 +5,10 @@ using MySqlConnector;
 using StitchERP.Infrastructure.Data;
 using StitchERP.Infrastructure.Identity;
 using StitchERP.Application.Identity;
+using StitchERP.Application.Inventory;
+using StitchERP.Infrastructure.Inventory;
+using StitchERP.Application.Programs;
+using StitchERP.Infrastructure.Programs;
 
 namespace StitchERP.Infrastructure;
 
@@ -19,6 +23,8 @@ public static class DependencyInjection
             services.AddDbContext<StitchErpDbContext>(options =>
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
             services.AddScoped<IUserStore, MySqlUserStore>();
+            services.AddScoped<IInventoryService, MySqlInventoryService>();
+            services.AddScoped<IProgramBomService, MySqlProgramBomService>();
         }
 
         return services;
