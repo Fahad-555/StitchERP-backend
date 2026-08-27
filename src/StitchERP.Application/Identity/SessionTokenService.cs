@@ -20,7 +20,7 @@ public sealed class SessionTokenService(string secret) : ISessionTokenService
     {
         ["SUPER_ADMIN"] = ["*", "USER_DELETE"],
         ["ADMIN"] = ["USER_VIEW", "USER_CREATE", "USER_DISABLE", "USER_DELETE", "PERMISSION_ASSIGN", "USER_RESET_PASSWORD", "PROGRAM_VIEW", "PROGRAM_CREATE", "PROGRAM_EDIT", "INVENTORY_VIEW", "INVENTORY_RECEIVE", "INVENTORY_RESERVE", "PO_VIEW", "PO_CREATE", "PO_SUBMIT", "PO_APPROVE", "PO_RECEIVE", "INVOICE_CREATE", "PAYMENT_CREATE", "SALES_ORDER_VIEW", "SALES_ORDER_CREATE", "SALES_ORDER_EDIT", "SALES_ORDER_APPROVE", "DELIVERY_CREATE"],
-        ["MANAGER"] = ["PROGRAM_VIEW", "PROGRAM_EDIT", "USER_DELETE"],
+        ["MANAGER"] = ["PROGRAM_VIEW", "PROGRAM_EDIT", "USER_DELETE", "NOTIFICATION_VIEW"],
         ["PRODUCTION_MANAGER"] = ["PROGRAM_VIEW", "PROGRAM_CREATE", "PROGRAM_EDIT", "INVENTORY_VIEW", "INVENTORY_RECEIVE"],
         ["PROCUREMENT_MANAGER"] = ["PO_VIEW", "PO_CREATE", "PO_SUBMIT", "PO_APPROVE", "PO_RECEIVE", "INVENTORY_VIEW"],
         ["PROCUREMENT_USER"] = ["PO_VIEW", "PO_CREATE", "PO_SUBMIT"],
@@ -36,7 +36,7 @@ public sealed class SessionTokenService(string secret) : ISessionTokenService
     public string Create(ManagedUser user)
     {
         var roles = user.Roles.Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
-        var permissions = roles.SelectMany(role => RolePermissions.TryGetValue(role, out var values) ? values : []).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+        var permissions = roles.SelectMany(role => RolePermissions.TryGetValue(role, out var values) ? values : []).Append("NOTIFICATION_VIEW").Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
         var payload = JsonSerializer.SerializeToUtf8Bytes(new TokenPayload(user.Id, user.OrganizationId, user.Username, roles, permissions, DateTimeOffset.UtcNow.Add(Lifetime).ToUnixTimeSeconds()));
         var encodedPayload = Base64Url(payload);
         var signature = Sign(encodedPayload);

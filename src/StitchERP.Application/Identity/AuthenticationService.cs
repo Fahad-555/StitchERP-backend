@@ -78,6 +78,7 @@ public sealed class AuthenticationService(IUserStore userStore) : IAuthenticatio
     public IReadOnlyCollection<RoleNotification> GetNotifications(long userId, IReadOnlyCollection<string> roles)
     {
         if (userStore.GetUsers().All(x => x.Id != userId)) throw new UnauthorizedAccessException("User was not found.");
+        if (roles.Any(role => role.Equals("SUPER_ADMIN", StringComparison.OrdinalIgnoreCase) || role.Equals("ADMIN", StringComparison.OrdinalIgnoreCase))) return notifications.ToArray();
         return notifications.Where(notification => notification.TargetRoles.Any(role => roles.Contains(role, StringComparer.OrdinalIgnoreCase))).ToArray();
     }
 
