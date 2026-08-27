@@ -13,6 +13,7 @@ public sealed record RoleNotification(long Id, string Type, string Title, string
 public interface IAuthenticationService
 {
     LoginResponse Login(LoginRequest request);
+    ManagedUser GetUser(long userId);
     ForgotPasswordResponse RequestPasswordReset(ForgotPasswordRequest request);
     void ResetPassword(ResetPasswordRequest request);
     IReadOnlyCollection<RoleNotification> GetNotifications(long userId, IReadOnlyCollection<string> roles);
@@ -38,6 +39,8 @@ public sealed class AuthenticationService(IUserStore userStore) : IAuthenticatio
             throw new UnauthorizedAccessException("Invalid username or password.");
         return new LoginResponse(user.Id, user.Username, user.DisplayName, user.OrganizationId, user.Roles, Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)));
     }
+
+    public ManagedUser GetUser(long userId) => userStore.GetUsers().First(x => x.Id == userId);
 
     public ForgotPasswordResponse RequestPasswordReset(ForgotPasswordRequest request)
     {

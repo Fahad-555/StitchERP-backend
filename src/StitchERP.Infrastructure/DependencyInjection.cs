@@ -3,6 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MySqlConnector;
 using StitchERP.Infrastructure.Data;
+using StitchERP.Infrastructure.Identity;
+using StitchERP.Application.Identity;
 
 namespace StitchERP.Infrastructure;
 
@@ -16,6 +18,7 @@ public static class DependencyInjection
         {
             services.AddDbContext<StitchErpDbContext>(options =>
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+            services.AddScoped<IUserStore, MySqlUserStore>();
         }
 
         return services;

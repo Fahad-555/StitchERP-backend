@@ -5,10 +5,15 @@ namespace StitchERP.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/auth")]
-public sealed class AuthController(IAuthenticationService service) : ControllerBase
+public sealed class AuthController(IAuthenticationService service, ISessionTokenService tokens) : ControllerBase
 {
     [HttpPost("login")]
-    public ActionResult<LoginResponse> Login(LoginRequest request) => Ok(service.Login(request));
+    public ActionResult<LoginResponse> Login(LoginRequest request)
+    {
+        var response = service.Login(request);
+        var user = service.GetUser(response.UserId);
+        return Ok(response with { AccessToken = tokens.Create(user) });
+    }
 
     [HttpPost("forgot-password")]
     public ActionResult<ForgotPasswordResponse> ForgotPassword(ForgotPasswordRequest request) => Ok(service.RequestPasswordReset(request));
