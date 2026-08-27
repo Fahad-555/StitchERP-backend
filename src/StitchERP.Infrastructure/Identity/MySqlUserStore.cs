@@ -1,6 +1,7 @@
 using System.Data;
 using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
+using MySqlConnector;
 using StitchERP.Application.Identity;
 using StitchERP.Infrastructure.Data;
 
@@ -31,7 +32,7 @@ public sealed class MySqlUserStore : IUserStore
     {
         if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(displayName) || password.Length < 8) throw new ArgumentException("Username, email, display name, and a password of at least 8 characters are required.");
         var names = displayName.Trim().Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
-        using var connection = db.Database.GetDbConnection();
+        using var connection = NewConnection();
         connection.Open();
         using var transaction = connection.BeginTransaction();
         using var command = connection.CreateCommand();
@@ -53,7 +54,7 @@ public sealed class MySqlUserStore : IUserStore
     public ManagedUser SetStatus(long id, bool isActive) { Execute("UPDATE app_users SET is_active = @active, updated_at = CURRENT_TIMESTAMP WHERE user_id = @id", ("@active", isActive), ("@id", id)); return FindById(id); }
     public ManagedUser SetRoles(long id, IReadOnlyCollection<string> roles)
     {
-        using var connection = db.Database.GetDbConnection(); connection.Open(); using var transaction = connection.BeginTransaction();
+        using var connection = NewConnection(); connection.Open(); using var transaction = connection.BeginTransaction();
         ExecuteOn(connection, transaction, "DELETE FROM app_user_roles WHERE user_id = @id", ("@id", id));
         foreach (var role in roles) ExecuteOn(connection, transaction, "INSERT INTO app_user_roles (user_id, role_id) SELECT @user, role_id FROM app_roles WHERE organization_id = (SELECT organization_id FROM app_users WHERE user_id = @user) AND role_code = @role", ("@user", id), ("@role", role));
         transaction.Commit(); return FindById(id);
@@ -65,7 +66,7 @@ public sealed class MySqlUserStore : IUserStore
     {
         var password = Environment.GetEnvironmentVariable("BOOTSTRAP_ADMIN_PASSWORD");
         if (string.IsNullOrWhiteSpace(password)) return;
-        using var connection = db.Database.GetDbConnection(); connection.Open();
+        using var connection = NewConnection(); connection.Open();
         using var command = connection.CreateCommand();
         command.CommandText = "INSERT INTO app_users (organization_id, username, email, first_name, last_name, is_active, password_hash) SELECT 1, 'admin', 'admin@stitcherp.local', 'System', 'Administrator', 1, @hash WHERE NOT EXISTS (SELECT 1 FROM app_users WHERE username = 'admin'); INSERT INTO app_user_roles (user_id, role_id) SELECT u.user_id, r.role_id FROM app_users u JOIN app_roles r ON r.organization_id = u.organization_id AND r.role_code = 'ADMIN' WHERE u.username = 'admin' AND NOT EXISTS (SELECT 1 FROM app_user_roles ur WHERE ur.user_id = u.user_id AND ur.role_id = r.role_id);";
         Add(command, "@hash", InMemoryUserStore.Hash(password));
@@ -73,7 +74,8 @@ public sealed class MySqlUserStore : IUserStore
     }
 
     private ManagedUser FindById(long id) => GetUsers().First(x => x.Id == id);
-    private IDbCommand Command(string sql) { var command = db.Database.GetDbConnection().CreateCommand(); command.CommandText = sql; if (command.Connection!.State != ConnectionState.Open) command.Connection.Open(); return command; }
+    private MySqlConnection NewConnection() => new(db.Database.GetConnectionString() ?? throw new InvalidOperationException("Database connection string is required."));
+    private IDbCommand Command(string sql) { var connection = NewConnection(); connection.Open(); var command = connection.CreateCommand(); command.CommandText = sql; return command; }
     private void Execute(string sql, params (string Name, object Value)[] parameters) { using var command = Command(sql); foreach (var parameter in parameters) Add(command, parameter.Name, parameter.Value); command.ExecuteNonQuery(); }
     private static void ExecuteOn(IDbConnection connection, IDbTransaction transaction, string sql, params (string Name, object Value)[] parameters) { using var command = connection.CreateCommand(); command.Transaction = transaction; command.CommandText = sql; foreach (var parameter in parameters) Add(command, parameter.Name, parameter.Value); command.ExecuteNonQuery(); }
     private static void Add(IDbCommand command, string name, object value) { var parameter = command.CreateParameter(); parameter.ParameterName = name; parameter.Value = value; command.Parameters.Add(parameter); }
