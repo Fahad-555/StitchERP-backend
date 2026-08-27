@@ -3,7 +3,7 @@ using System.Text;
 
 namespace StitchERP.Application.Identity;
 
-public sealed record ManagedUser(long Id, string Username, string Email, string DisplayName, long OrganizationId, IReadOnlyCollection<string> Roles, bool IsActive, string PasswordHash);
+public sealed record ManagedUser(long Id, string Username, string Email, string DisplayName, long OrganizationId, IReadOnlyCollection<string> Roles, bool IsActive, bool EmailVerified, string PasswordHash);
 public sealed record ChangePasswordRequest(long UserId, string CurrentPassword, string NewPassword);
 
 public interface IUserStore
@@ -15,6 +15,9 @@ public interface IUserStore
     ManagedUser SetRoles(long id, IReadOnlyCollection<string> roles);
     ManagedUser SetPassword(long id, string password);
     ManagedUser ChangePassword(ChangePasswordRequest request);
+    ManagedUser Delete(long id);
+    string CreateVerificationToken(long id);
+    ManagedUser VerifyEmail(string token);
 }
 
 public sealed class InMemoryUserStore : IUserStore
@@ -22,7 +25,7 @@ public sealed class InMemoryUserStore : IUserStore
     private readonly object sync = new();
     private readonly List<ManagedUser> users =
     [
-        new(1, "fahad.bhutta", "fahad.bhutta@stitcherp.local", "Fahad Bhutta", 1, ["MANAGER", "PRODUCTION_MANAGER"], true, Hash("StitchERP-Demo-2026"))
+        new(1, "fahadbhutta", "fahad.bhutta@stitcherp.local", "Fahad Bhutta", 1, ["SUPER_ADMIN"], true, true, Hash("Pakistan123@"))
     ];
     private long nextId = 1;
 
@@ -41,7 +44,7 @@ public sealed class InMemoryUserStore : IUserStore
         {
             if (users.Any(x => x.Username.Equals(username, StringComparison.OrdinalIgnoreCase) || x.Email.Equals(email, StringComparison.OrdinalIgnoreCase)))
                 throw new InvalidOperationException("Username or email already exists.");
-            var user = new ManagedUser(++nextId, username.Trim(), email.Trim(), displayName.Trim(), organizationId, roles, true, Hash(password));
+            var user = new ManagedUser(++nextId, username.Trim(), email.Trim(), displayName.Trim(), organizationId, roles, true, false, Hash(password));
             users.Add(user);
             return user;
         }
@@ -54,6 +57,10 @@ public sealed class InMemoryUserStore : IUserStore
         if (password.Length < 8) throw new ArgumentException("Password must be at least 8 characters.");
         return Update(id, user => user with { PasswordHash = Hash(password) });
     }
+
+    public ManagedUser Delete(long id) => Update(id, user => user with { IsActive = false });
+    public string CreateVerificationToken(long id) => Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+    public ManagedUser VerifyEmail(string token) => throw new UnauthorizedAccessException("Email verification token is invalid or expired.");
 
     public ManagedUser ChangePassword(ChangePasswordRequest request)
     {

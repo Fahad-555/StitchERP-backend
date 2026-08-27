@@ -35,8 +35,8 @@ public sealed class AuthenticationService(IUserStore userStore) : IAuthenticatio
         if (string.IsNullOrWhiteSpace(request.Username) || string.IsNullOrWhiteSpace(request.Password))
             throw new ArgumentException("Username and password are required.");
         var user = userStore.Find(request.Username);
-        if (user is null || !user.IsActive || !CryptographicOperations.FixedTimeEquals(Convert.FromBase64String(user.PasswordHash), Convert.FromBase64String(InMemoryUserStore.Hash(request.Password))))
-            throw new UnauthorizedAccessException("Invalid username or password.");
+        if (user is null || !user.IsActive || !user.EmailVerified || !CryptographicOperations.FixedTimeEquals(Convert.FromBase64String(user.PasswordHash), Convert.FromBase64String(InMemoryUserStore.Hash(request.Password))))
+            throw new UnauthorizedAccessException(user is not null && !user.EmailVerified ? "Email address must be verified before signing in." : "Invalid username or password.");
         return new LoginResponse(user.Id, user.Username, user.DisplayName, user.OrganizationId, user.Roles, Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)));
     }
 
