@@ -92,9 +92,15 @@ public sealed class MySqlUserStore : IUserStore
     private void EnsureLifecycleSchema()
     {
         using var connection = NewConnection(); connection.Open();
-        using var command = connection.CreateCommand();
-        command.CommandText = "ALTER TABLE app_users ADD COLUMN IF NOT EXISTS email_verified TINYINT DEFAULT 0 NOT NULL; ALTER TABLE app_users ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP NULL; CREATE TABLE IF NOT EXISTS email_verification_tokens (email_verification_token_id BIGINT AUTO_INCREMENT PRIMARY KEY, user_id BIGINT NOT NULL, token_hash VARCHAR(128) NOT NULL UNIQUE, expires_at TIMESTAMP NOT NULL, used_at TIMESTAMP NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, CONSTRAINT fk_email_verification_user FOREIGN KEY (user_id) REFERENCES app_users(user_id)); CREATE INDEX IF NOT EXISTS idx_email_verification_user_expiry ON email_verification_tokens (user_id, expires_at, used_at);";
-        command.ExecuteNonQuery();
+        ExecuteSchema(connection, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'app_users' AND column_name = 'email_verified'", "ALTER TABLE app_users ADD COLUMN email_verified TINYINT DEFAULT 0 NOT NULL");
+        ExecuteSchema(connection, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'app_users' AND column_name = 'deleted_at'", "ALTER TABLE app_users ADD COLUMN deleted_at TIMESTAMP NULL");
+        ExecuteSchema(connection, "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'email_verification_tokens'", "CREATE TABLE email_verification_tokens (email_verification_token_id BIGINT AUTO_INCREMENT PRIMARY KEY, user_id BIGINT NOT NULL, token_hash VARCHAR(128) NOT NULL UNIQUE, expires_at TIMESTAMP NOT NULL, used_at TIMESTAMP NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL, CONSTRAINT fk_email_verification_user FOREIGN KEY (user_id) REFERENCES app_users(user_id))");
+    }
+
+    private static void ExecuteSchema(MySqlConnection connection, string checkSql, string createSql)
+    {
+        using var check = connection.CreateCommand(); check.CommandText = checkSql;
+        if (Convert.ToInt32(check.ExecuteScalar()) == 0) { using var create = connection.CreateCommand(); create.CommandText = createSql; create.ExecuteNonQuery(); }
     }
 
     private ManagedUser FindById(long id) => GetUsers().First(x => x.Id == id);
