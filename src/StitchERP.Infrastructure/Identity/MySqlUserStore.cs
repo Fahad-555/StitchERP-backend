@@ -68,7 +68,7 @@ public sealed class MySqlUserStore : IUserStore
         if (string.IsNullOrWhiteSpace(password)) return;
         using var connection = NewConnection(); connection.Open();
         using var command = connection.CreateCommand();
-        command.CommandText = "INSERT INTO app_users (organization_id, username, email, first_name, last_name, is_active, password_hash) SELECT 1, 'admin', 'admin@stitcherp.local', 'System', 'Administrator', 1, @hash WHERE NOT EXISTS (SELECT 1 FROM app_users WHERE username = 'admin'); INSERT INTO app_user_roles (user_id, role_id) SELECT u.user_id, r.role_id FROM app_users u JOIN app_roles r ON r.organization_id = u.organization_id AND r.role_code = 'ADMIN' WHERE u.username = 'admin' AND NOT EXISTS (SELECT 1 FROM app_user_roles ur WHERE ur.user_id = u.user_id AND ur.role_id = r.role_id);";
+        command.CommandText = "INSERT INTO app_roles (organization_id, role_name, role_code, is_system) SELECT 1, 'Admin', 'ADMIN', 1 WHERE NOT EXISTS (SELECT 1 FROM app_roles WHERE organization_id = 1 AND role_code = 'ADMIN'); INSERT INTO app_users (organization_id, username, email, first_name, last_name, is_active, password_hash) SELECT 1, 'admin', 'admin@stitcherp.local', 'System', 'Administrator', 1, @hash WHERE NOT EXISTS (SELECT 1 FROM app_users WHERE username = 'admin'); INSERT INTO app_user_roles (user_id, role_id) SELECT u.user_id, r.role_id FROM app_users u JOIN app_roles r ON r.organization_id = u.organization_id AND r.role_code = 'ADMIN' WHERE u.username = 'admin' AND NOT EXISTS (SELECT 1 FROM app_user_roles ur WHERE ur.user_id = u.user_id AND ur.role_id = r.role_id);";
         Add(command, "@hash", InMemoryUserStore.Hash(password));
         command.ExecuteNonQuery();
     }
