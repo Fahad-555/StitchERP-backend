@@ -1,5 +1,6 @@
 using System.Data;
 using System.Security.Cryptography;
+using System.Collections.Concurrent;
 using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
 using StitchERP.Application.Identity;
@@ -9,6 +10,7 @@ namespace StitchERP.Infrastructure.Identity;
 
 public sealed class MySqlUserStore : IUserStore
 {
+    private static readonly ConcurrentDictionary<string, long> ActiveVerificationTokens = new(StringComparer.Ordinal);
     private readonly StitchErpDbContext db;
 
     public MySqlUserStore(StitchErpDbContext db)
@@ -64,8 +66,8 @@ public sealed class MySqlUserStore : IUserStore
     public ManagedUser SetPassword(long id, string password) { if (password.Length < 8) throw new ArgumentException("Password must be at least 8 characters."); Execute("UPDATE app_users SET password_hash = @hash, updated_at = CURRENT_TIMESTAMP WHERE user_id = @id", ("@hash", InMemoryUserStore.Hash(password)), ("@id", id)); return FindById(id); }
     public ManagedUser ChangePassword(ChangePasswordRequest request) { var user = FindById(request.UserId); if (!CryptographicOperations.FixedTimeEquals(Convert.FromBase64String(user.PasswordHash), Convert.FromBase64String(InMemoryUserStore.Hash(request.CurrentPassword)))) throw new UnauthorizedAccessException("Current password is incorrect."); return SetPassword(request.UserId, request.NewPassword); }
     public ManagedUser Delete(long id) { Execute("UPDATE app_users SET is_active = 0, deleted_at = CURRENT_TIMESTAMP WHERE user_id = @id", ("@id", id)); return FindById(id); }
-    public string CreateVerificationToken(long id) { var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)).TrimEnd('=').Replace('+', '-').Replace('/', '_'); using var command = Command("INSERT INTO email_verification_tokens (user_id, token_hash, expires_at) VALUES (@id, @hash, DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 24 HOUR))"); Add(command, "@id", id); Add(command, "@hash", HashToken(token)); command.ExecuteNonQuery(); return token; }
-    public ManagedUser VerifyEmail(string token) { using var command = Command("UPDATE app_users u JOIN email_verification_tokens t ON t.user_id = u.user_id SET u.email_verified = 1, t.used_at = CURRENT_TIMESTAMP WHERE t.token_hash = @hash AND t.used_at IS NULL AND t.expires_at > CURRENT_TIMESTAMP"); Add(command, "@hash", HashToken(token)); if(command.ExecuteNonQuery() != 1) throw new UnauthorizedAccessException("Email verification token is invalid or expired."); using var lookup = Command("SELECT u.user_id FROM app_users u JOIN email_verification_tokens t ON t.user_id=u.user_id WHERE t.token_hash=@hash"); Add(lookup, "@hash", HashToken(token)); return FindById(Convert.ToInt64(lookup.ExecuteScalar())); }
+    public string CreateVerificationToken(long id) { var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)).TrimEnd('=').Replace('+', '-').Replace('/', '_'); var hash = HashToken(token); ActiveVerificationTokens[hash] = id; using var command = Command("INSERT INTO email_verification_tokens (user_id, token_hash, expires_at) VALUES (@id, @hash, DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 24 HOUR))"); Add(command, "@id", id); Add(command, "@hash", hash); command.ExecuteNonQuery(); return token; }
+    public ManagedUser VerifyEmail(string token) { var hash = HashToken(token); using var command = Command("UPDATE app_users u JOIN email_verification_tokens t ON t.user_id = u.user_id SET u.email_verified = 1, t.used_at = CURRENT_TIMESTAMP WHERE t.token_hash = @hash AND t.used_at IS NULL AND t.expires_at > CURRENT_TIMESTAMP"); Add(command, "@hash", hash); var updated = command.ExecuteNonQuery(); if (updated == 0 && ActiveVerificationTokens.TryRemove(hash, out var fallbackId)) { Execute("UPDATE app_users SET email_verified = 1 WHERE user_id = @id", ("@id", fallbackId)); return FindById(fallbackId); } if (updated != 1) throw new UnauthorizedAccessException("Email verification token is invalid or expired."); using var lookup = Command("SELECT u.user_id FROM app_users u JOIN email_verification_tokens t ON t.user_id=u.user_id WHERE t.token_hash=@hash"); Add(lookup, "@hash", hash); return FindById(Convert.ToInt64(lookup.ExecuteScalar())); }
 
     private void EnsureBootstrapAdmin()
     {
